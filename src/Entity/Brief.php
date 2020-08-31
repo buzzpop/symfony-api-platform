@@ -83,14 +83,14 @@ use App\Controller\BriefController;
  *     },
  *     itemOperations={
  *      "get",
-        "get"={
- *           "get_briefbyPromos"={
- *     "method"="GET",
- *     "path"="/formateurs/promo/{id_p}/briefs/{id_b}",
- *     "access_control"="(is_granted('ROLE_Administrateur') or is_granted('ROLE_Formateur') or is_granted('ROLE_CM'))",
- *      "access_control_message"="Vous n'avez pas access à cette Ressource",
- *       "route_name"="get_briefbyPromos",
- *     },
+ *      "get"={
+ *      "get_briefbyPromos"={
+ *          "method"="GET",
+ *          "path"="/formateurs/promo/{id_p}/briefs/{id_b}",
+ *          "access_control"="(is_granted('ROLE_Administrateur') or is_granted('ROLE_Formateur') or is_granted('ROLE_CM'))",
+ *          "access_control_message"="Vous n'avez pas access à cette Ressource",
+ *          "route_name"="get_briefbyPromos",
+ *      },
  *     },
  *
  *          "put_brief"={

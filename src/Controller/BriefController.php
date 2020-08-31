@@ -387,21 +387,16 @@ class BriefController extends AbstractController
      *  }
      * )
      */
-    public function affecterBrief($idPr, $idBr, SerializerInterface $serializer,Request $request, EntityManagerInterface $manager, BriefMaPromosRepository $rep, BriefApprenantRepository $brAp, EtatBriefGroupeRepository $etBrGr)
+    public function affecterBrief($idPr, $idBr, SerializerInterface $serializer,Request $request, EntityManagerInterface $manager, BriefMaPromosRepository $rep, BriefApprenantRepository $brAp)
     {
         $entityManager = $this->getDoctrine()->getManager();
         $Brief = $entityManager->getRepository(Brief::class)->find($idBr);
         $Promos = $entityManager->getRepository(Promos::class)->find($idPr);
         $JsonObject = $request->getContent();
         $JsonObject = $serializer->decode($JsonObject,"json");
-        if (!$Brief) {
+        if (!$Brief || !$Promos) {
             throw $this->createNotFoundException(
-                'Pas de Brief Pour l\'id '.$idBr
-            );
-        }
-        if (!$Promos) {
-            throw $this->createNotFoundException(
-                'Pas de Promos Pour l\'id '.$idPr
+                'le Brief ou la promo n\'existe pas'
             );
         }
         $briefPromo = $rep->findBriefPromo($idBr, $idPr);
@@ -411,29 +406,60 @@ class BriefController extends AbstractController
             );
         }
         if (isset($JsonObject['groupe'])) {
-            $Groupe = $entityManager->getRepository(Groupe::class)->find($JsonObject['groupe']);
-            $etatBriefGroupe = new EtatBriefGroupe();
-            $etatBriefGroupe->setGroupe($Groupe);
-            $etatBriefGroupe->setBrief($Brief);
+            $Groupe = explode(",",$JsonObject['groupe']);
+            foreach($Groupe as $grp){
+                $grpObject = $entityManager->getRepository(Groupe::class)->find($grp);
+                $etatBriefGroupe = new EtatBriefGroupe();
+                $etatBriefGroupe->setGroupe($grpObject);
+                $etatBriefGroupe->setBrief($Brief);
+                foreach($grpObject->getApprenant() as $app){
+                    dd($app);
+                    $mail= (new \Swift_Message("Affectation Brief"));
+                    $mail->setFrom("syfadilou3@gmail.com")
+                        ->setTo($app->getEmail())
+                        ->setSubject("Affectation d'un brief")
+                        ->setBody("Bonjour Cher(e) ".$app->getFirstName()." ".$app->getLastName()."
+                        le brief ".$Brief->getNomBrief()." vous a été affecter")
+                        ;
+
+                        $this->mailer->send($mail);
+                }
             $manager->persist($etatBriefGroupe);
-            $manager->flush();
-            return $this->json("success",Response::HTTP_OK);
+            }
         }
         if (isset($JsonObject['apprenant'])) {
             $Apprenant = $entityManager->getRepository(Apprenant::class)->find($JsonObject['apprenant']);
             if (count($brAp->ifApprenantBrief($Apprenant->getId(), $briefPromo[0]->getId()))) {
-                return $this->json("Brief déja assigner à cette apprenant",Response::HTTP_BAD_REQUEST,[],true);
+                return $this->json("Brief déja assigner à cette apprenant");
             }
             $BriefApprenant =  new BriefApprenant();
             $BriefApprenant->setApprenant($Apprenant);
-            $BriefApprenant->setBriefMaPromos($briefPromo[0]);
+            $BriefApprenant->setBriefMaPromo($briefPromo[0]);
+            $mail= (new \Swift_Message("Affectation Brief"));
+              $mail->setFrom("syfadilou3@gmail.com")
+                  ->setTo($Apprenant->getEmail())
+                  ->setSubject("Affectation d'un brief")
+                  ->setBody("Bonjour Cher(e) ".$Apprenant->getFirstName()." ".$Apprenant->getLastName()."
+                  le brief ".$Brief->getNomBrief()." vous a été affecter")
+                  ;
+                  $this->mailer->send($mail);
             $manager->persist($BriefApprenant);
-            $manager->flush();
-            return $this->json("success",Response::HTTP_OK);
+            
+        }else {
+            if (isset($JsonObject['dsf_apprenant'])) {
+                $Apprenant = $entityManager->getRepository(Apprenant::class)->find($JsonObject['dsf_apprenant']);
+                $brmapromo = $brAp->ifApprenantBrief($Apprenant->getId(), $briefPromo[0]->getId())[0];
+                if (!$brmapromo) {
+                    return $this->json("Brief pas assigner à cette apprenant");
+                }
+                $entityManager->remove($brmapromo);
+            }
         }
-        return $this->json("ajouter un groupe ou un apprenant",Response::HTTP_BAD_REQUEST,[],true);
         
-
+        $manager->flush();
+        return $this->json("success",Response::HTTP_OK);
+        
+        
     }
 
     /**
