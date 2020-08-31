@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Chat;
 use App\Repository\ChatRepository;
+use App\Repository\GroupeRepository;
 use App\Repository\PromosRepository;
 use App\Repository\ApprenantRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -56,16 +57,45 @@ class ChatController extends AbstractController
      * }
      * )
      */
-    public function addChat(SerializerInterface $serializer,Request $request, EntityManagerInterface $manager)
+    public function addChat(int  $id, int $id1,ApprenantRepository $apprenantRepository,GroupeRepository $groupeRepository,SerializerInterface $serializer,Request $request, EntityManagerInterface $manager)
     {
-        $jsonGroupC= $request->getContent();
+            $jsonGroupC= json_decode($request->getContent(),true);
+            if (!isset($jsonGroupC['message'])){
+                return new JsonResponse("Veuillez renseigner un message", Response::HTTP_BAD_REQUEST, [], true);
+            }
+
+        $groupe= $groupeRepository->findOneBy(
+            [
+               "promos"=>$id
+            ]
+        );
+        if (!$groupe){
+            return new JsonResponse("Le promos dont l'id=" . $id . "n'existe pas", Response::HTTP_BAD_REQUEST, [], true);
+        }
+
+            foreach ($groupe->getApprenant() as $apprenant){
+                if ($apprenant->getId() == $id1){
+                    $promos=$groupe->getPromos();
+                    $apprenant= $apprenantRepository->findOneBy(["id"=>$id1]);
+                $chat= new  Chat();
+                $chat->setMessage($jsonGroupC['message']);
+                if ($jsonGroupC['pieceJointes']){
+                    $chat->setPieceJointes($jsonGroupC['pieceJointes']);
+                }
+                $chat->setDate(new \DateTime())
+                    ->setPromos($promos)
+                    ->setUser($apprenant);
+
+                }else{
+                    return new JsonResponse("L'apprenant dont l'id=" . $id . "n'est pas dans le promos", Response::HTTP_BAD_REQUEST, [], true);
+                }
+            }
 
 
-        $groupCObject= $serializer->deserialize($jsonGroupC,Chat::class,'json');
 
-        $manager->persist($groupCObject);
+        $manager->persist($chat);
         $manager->flush();
-        return new JsonResponse('success', Response::HTTP_CREATED,[],'true');
+        return new JsonResponse('chat enregistré', Response::HTTP_CREATED,[],'true');
     }
 
 }
