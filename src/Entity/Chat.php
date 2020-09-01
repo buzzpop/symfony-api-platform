@@ -7,8 +7,8 @@ use App\Repository\ChatRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+
 /**
- * @ORM\Entity(repositoryClass=ChatRepository::class)
  * @ORM\Entity(repositoryClass=ChatRepository::class)
  * @ApiResource(
  * normalizationContext={"groups"={"chat:read"}},
@@ -51,11 +51,7 @@ class Chat
      */
     private $message;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     *  @Groups({"chat:read"})
-     */
-    private $pieceJointes;
+
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="chats")
@@ -75,6 +71,11 @@ class Chat
      */
     private $date;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $pieceJointes;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -92,17 +93,6 @@ class Chat
         return $this;
     }
 
-    public function getPieceJointes(): ?string
-    {
-        return $this->pieceJointes;
-    }
-
-    public function setPieceJointes(string $pieceJointes): self
-    {
-        $this->pieceJointes = $pieceJointes;
-
-        return $this;
-    }
 
     public function getUser(): ?User
     {
@@ -136,6 +126,18 @@ class Chat
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getPieceJointes(): ?string
+    {
+        return $this->pieceJointes;
+    }
+
+    public function setPieceJointes(?string $pieceJointes): self
+    {
+        $this->pieceJointes = $pieceJointes;
 
         return $this;
     }

@@ -257,12 +257,11 @@ class LivrablePartielController extends AbstractController
                                 }
                             }
                         }
-
-                    return $this->json($apprenants, 200, [], ["groups" => ["competence_collection"]]);
                 }
             }
 
         }
+        return $this->json($apprenants, 200, [], ["groups" => ["competence_collection"]]);
     }
 
 }

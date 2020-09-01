@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ApiResource(
  *
  *     
+ *
  * )
  */
 class Apprenant extends User
