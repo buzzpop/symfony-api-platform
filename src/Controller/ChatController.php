@@ -86,12 +86,8 @@ class ChatController extends AbstractController
                     ->setPromos($promos)
                     ->setUser($apprenant);
 
-                }else{
-                    return new JsonResponse("L'apprenant dont l'id=" . $id . "n'est pas dans le promos", Response::HTTP_BAD_REQUEST, [], true);
                 }
             }
-
-
 
         $manager->persist($chat);
         $manager->flush();
