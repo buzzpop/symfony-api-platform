@@ -13,9 +13,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity(repositoryClass=ApprenantRepository::class)
 
  * @ApiResource(
- *     collectionOperations={},
  *
- *
+ *     
  * )
  */
 class Apprenant extends User

@@ -18,6 +18,7 @@ use App\Entity\Formateur;
 use App\Entity\Groupe;
 use App\Entity\Niveau;
 use App\Entity\Promos;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Faker\Factory;
@@ -211,6 +212,7 @@ class AppFixtures extends Fixture
             $chat = new Chat();
             $chat->setMessage('Ceci est un commentaire')
                     ->setPieceJointes('piece Jointes')
+                    ->setDate(new \DateTime('now'))
                     ->setUser($user)
                     ->setPromos($promos)
                     ;

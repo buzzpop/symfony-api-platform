@@ -4,16 +4,11 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ChatRepository;
-
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=ChatRepository::class)
-use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
-
-/**
  * @ORM\Entity(repositoryClass=ChatRepository::class)
  * @ApiResource(
  * normalizationContext={"groups"={"chat:read"}},
