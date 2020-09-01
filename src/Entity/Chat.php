@@ -8,6 +8,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 
+<<<<<<< HEAD
+=======
+/**
+ * @ORM\Entity(repositoryClass=ChatRepository::class)
+>>>>>>> e40c31e8c4542c3743fb3af6b2efbba84dae2849
 /**
  * @ORM\Entity(repositoryClass=ChatRepository::class)
  * @ApiResource(
